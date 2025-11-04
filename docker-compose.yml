@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data:/data/db
+    networks: [backupnet]
+
+  backup_service:
+    build: .
+    container_name: mongo-backup-scheduler
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backups:/app/backups
+    networks: [backupnet]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  mongo_data:
+
+networks:
+  backupnet:
+    driver: bridge
+
