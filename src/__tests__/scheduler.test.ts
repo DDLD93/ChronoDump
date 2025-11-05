@@ -63,8 +63,8 @@ describe('scheduleBackups', () => {
 
     let cronCallback: (() => Promise<void>) | null = null;
     (cron.validate as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (cron.schedule as ReturnType<typeof vi.fn>).mockImplementation((expr: string, callback: () => Promise<void>) => {
-      cronCallback = callback;
+    (cron.schedule as ReturnType<typeof vi.fn>).mockImplementation((expr: string, callback: unknown) => {
+      cronCallback = callback as () => Promise<void>;
       return { start: vi.fn() };
     });
 
@@ -76,8 +76,7 @@ describe('scheduleBackups', () => {
 
     // Simulate cron trigger
     if (cronCallback) {
-      const cb = cronCallback;
-      await cb();
+      await (cronCallback as () => Promise<void>)();
     }
 
     expect(runAllBackups).toHaveBeenCalled();
@@ -93,8 +92,8 @@ describe('scheduleBackups', () => {
 
     let cronCallback: (() => Promise<void>) | null = null;
     (cron.validate as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (cron.schedule as ReturnType<typeof vi.fn>).mockImplementation((expr: string, callback: () => Promise<void>) => {
-      cronCallback = callback;
+    (cron.schedule as ReturnType<typeof vi.fn>).mockImplementation((expr: string, callback: unknown) => {
+      cronCallback = callback as () => Promise<void>;
       return { start: vi.fn() };
     });
 
@@ -108,8 +107,7 @@ describe('scheduleBackups', () => {
 
     // Should not throw when cron callback fails
     if (cronCallback) {
-      const cb = cronCallback;
-      await expect(cb()).resolves.not.toThrow();
+      await expect((cronCallback as () => Promise<void>)()).resolves.not.toThrow();
     }
 
     restore();
