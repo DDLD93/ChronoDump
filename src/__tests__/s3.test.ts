@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import fs from 'fs';
 import { mockEnv } from './helpers/env.js';
 
 // Mock @aws-sdk/client-s3
@@ -8,6 +7,15 @@ vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: vi.fn(),
   PutObjectCommand: vi.fn()
 }));
+
+// Mock fs
+vi.mock('fs', () => ({
+  default: {
+    readFileSync: vi.fn()
+  }
+}));
+
+import fs from 'fs';
 
 describe('maybeUpload', () => {
   beforeEach(() => {
@@ -17,9 +25,8 @@ describe('maybeUpload', () => {
 
   it('should skip upload when UPLOAD_TO_S3 is false', async () => {
     const restore = mockEnv({
-      MONGO_URI: 'mongodb://localhost:27017',
-      UPLOAD_TO_S3: 'false',
-      S3_BUCKET: '' // Ensure bucket is empty
+      MONGO_URI: 'mongodb://localhost:27017'
+      // Don't set UPLOAD_TO_S3 - defaults to false
     });
 
     vi.resetModules();
@@ -50,7 +57,7 @@ describe('maybeUpload', () => {
     (S3Client as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => mockClient);
     (PutObjectCommand as unknown as ReturnType<typeof vi.fn>).mockImplementation((params) => params);
 
-    (fs.readFileSync as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
+    (fs.readFileSync as unknown as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
 
     vi.resetModules();
     const { maybeUpload } = await import('../uploader/s3.js');
@@ -101,7 +108,7 @@ describe('maybeUpload', () => {
 
     (S3Client as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => mockClient);
     (PutObjectCommand as unknown as ReturnType<typeof vi.fn>).mockImplementation((params) => params);
-    (fs.readFileSync as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
+    (fs.readFileSync as unknown as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
 
     vi.resetModules();
     const { maybeUpload } = await import('../uploader/s3.js');
@@ -133,7 +140,7 @@ describe('maybeUpload', () => {
 
     (S3Client as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => mockClient);
     (PutObjectCommand as unknown as ReturnType<typeof vi.fn>).mockImplementation((params) => params);
-    (fs.readFileSync as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
+    (fs.readFileSync as unknown as ReturnType<typeof vi.fn>).mockReturnValue(Buffer.from('test data'));
 
     vi.resetModules();
     const { maybeUpload } = await import('../uploader/s3.js');

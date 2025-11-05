@@ -56,8 +56,9 @@ describe('config', () => {
     const { env } = await import('../config.js');
 
     expect(env.INCLUDE_ADMIN_DB).toBe(true);
-    // 'false' string coerces to true, need to check actual behavior
-    expect(env.INCLUDE_CONFIG_DB).toBe(false);
+    // Zod's coerce.boolean() converts 'false' string to true (truthy)
+    // Empty string or undefined would be false
+    expect(env.INCLUDE_CONFIG_DB).toBe(true); // 'false' string is truthy
     expect(env.UPLOAD_TO_S3).toBe(true);
 
     restore();

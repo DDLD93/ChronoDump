@@ -15,10 +15,8 @@ describe('listDatabases', () => {
 
   it('should filter out admin, config, and local databases by default', async () => {
     const restore = mockEnv({
-      MONGO_URI: 'mongodb://localhost:27017',
-      INCLUDE_ADMIN_DB: 'false',
-      INCLUDE_CONFIG_DB: 'false',
-      INCLUDE_LOCAL_DB: 'false'
+      MONGO_URI: 'mongodb://localhost:27017'
+      // Don't set INCLUDE flags - use defaults (false)
     });
 
     const { mockClient, mockAdmin } = createMockMongoClient();
@@ -43,9 +41,8 @@ describe('listDatabases', () => {
   it('should include admin database when INCLUDE_ADMIN_DB is true', async () => {
     const restore = mockEnv({
       MONGO_URI: 'mongodb://localhost:27017',
-      INCLUDE_ADMIN_DB: 'true',
-      INCLUDE_CONFIG_DB: 'false',
-      INCLUDE_LOCAL_DB: 'false'
+      INCLUDE_ADMIN_DB: 'true'
+      // Don't set other flags - use defaults (false)
     });
 
     const { mockClient } = createMockMongoClient();

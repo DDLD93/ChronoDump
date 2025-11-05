@@ -36,7 +36,7 @@ describe('cleanupOldBackups', () => {
     vi.clearAllMocks();
   });
 
-  it('should delete files older than retention period', () => {
+  it('should delete files older than retention period', async () => {
     const restore = mockEnv({
       MONGO_URI: 'mongodb://localhost:27017',
       BACKUP_PATH: '/tmp/test-backups',
@@ -61,7 +61,7 @@ describe('cleanupOldBackups', () => {
     });
 
     vi.resetModules();
-    const { cleanupOldBackups } = require('../backup.js');
+    const { cleanupOldBackups } = await import('../backup.js');
     cleanupOldBackups();
 
     // Should delete old file but not new file

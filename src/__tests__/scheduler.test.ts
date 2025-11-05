@@ -69,14 +69,15 @@ describe('scheduleBackups', () => {
     });
 
     vi.resetModules();
-    const { scheduleBackups } = require('../scheduler.js');
+    const { scheduleBackups } = await import('../scheduler.js');
     const { runAllBackups } = await import('../backup.js');
 
     scheduleBackups();
 
     // Simulate cron trigger
     if (cronCallback) {
-      await cronCallback();
+      const cb = cronCallback;
+      await cb();
     }
 
     expect(runAllBackups).toHaveBeenCalled();
@@ -98,7 +99,7 @@ describe('scheduleBackups', () => {
     });
 
     vi.resetModules();
-    const { scheduleBackups } = require('../scheduler.js');
+    const { scheduleBackups } = await import('../scheduler.js');
     const { runAllBackups } = await import('../backup.js');
 
     (runAllBackups as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('Backup failed'));
@@ -107,7 +108,8 @@ describe('scheduleBackups', () => {
 
     // Should not throw when cron callback fails
     if (cronCallback) {
-      await expect(cronCallback()).resolves.not.toThrow();
+      const cb = cronCallback;
+      await expect(cb()).resolves.not.toThrow();
     }
 
     restore();
