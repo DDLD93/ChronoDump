@@ -22,8 +22,8 @@ RUN apt-get update \
 
 ENV NODE_ENV=production
 COPY --from=build /app/dist ./dist
-COPY package.json ./
-RUN npm pkg delete devDependencies && npm ci --omit=dev
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev || npm install --omit=dev
 
 # Create backup dir
 RUN mkdir -p /app/backups
